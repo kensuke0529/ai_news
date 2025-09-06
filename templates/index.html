@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Analyst</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">
+                    <i class="fas fa-robot"></i>
+                    AI News Analyst
+                </h1>
+                <p class="subtitle">Intelligent AI news analysis and insights</p>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="news">
+                <i class="fas fa-newspaper"></i>
+                News
+            </button>
+            <button class="nav-tab" data-tab="search">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+            <button class="nav-tab" data-tab="summary">
+                <i class="fas fa-chart-line"></i>
+                Summary
+            </button>
+            <button class="nav-tab" data-tab="chat">
+                <i class="fas fa-comments"></i>
+                Chat
+            </button>
+        </nav>
+
+        <!-- News Section -->
+        <section id="news" class="tab-content active">
+            <div class="section-header">
+                <h2>Latest AI News</h2>
+                <div class="news-controls">
+                    <select id="weekSelector" class="week-selector">
+                        {% for week in available_weeks %}
+                        <option value="{{ week.value }}" {% if week.value == news_data.week %}selected{% endif %}>
+                            {{ week.label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-secondary" id="refreshNewsBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            
+            <div class="news-grid" id="newsGrid">
+                {% for article in news_data.articles %}
+                <article class="news-card">
+                    <div class="news-card-header">
+                        <h3 class="news-title">{{ article.title }}</h3>
+                        <span class="news-date">{{ article.date }}</span>
+                    </div>
+                    <div class="news-summary">
+                        <p>{{ article.summary }}</p>
+                    </div>
+                    <div class="news-actions">
+                        <a href="{{ article.link }}" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i>
+                            Read Full Article
+                        </a>
+                        <button class="btn btn-secondary ask-about-btn" data-title="{{ article.title }}">
+                            <i class="fas fa-question-circle"></i>
+                            Ask About This
+                        </button>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search" class="tab-content">
+            <div class="section-header">
+                <h2>Search Articles</h2>
+                <p class="section-subtitle">Use AI-powered search to find relevant articles across all weeks</p>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-controls">
+                    <div class="search-input-group">
+                        <input type="text" id="searchInput" placeholder="Search for articles, topics, or keywords..." class="search-input">
+                        <button id="searchBtn" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                            Search
+                        </button>
+                    </div>
+                    <div class="search-filters">
+                        <select id="searchWeekFilter" class="week-filter">
+                            <option value="all">All Weeks</option>
+                            {% for week in available_weeks %}
+                            <option value="{{ week.value }}">{{ week.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <select id="searchLimit" class="limit-filter">
+                            <option value="5">5 results</option>
+                            <option value="10" selected>10 results</option>
+                            <option value="20">20 results</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-results" id="searchResults">
+                    <div class="search-placeholder">
+                        <i class="fas fa-search"></i>
+                        <p>Enter a search query to find relevant articles using AI-powered search</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section id="summary" class="tab-content">
+            <div class="section-header">
+                <h2>Weekly AI Summary</h2>
+                <button class="btn btn-primary" id="generateSummaryBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    Generate New Summary
+                </button>
+            </div>
+            
+            <div class="summary-container">
+                <div class="summary-content" id="summaryContent">
+                    <div class="loading-placeholder">
+                        <i class="fas fa-chart-line"></i>
+                        <p>Click "Generate New Summary" to create an AI-powered weekly analysis</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section id="chat" class="tab-content">
+            <div class="section-header">
+                <h2>AI News Chat</h2>
+                <p class="section-subtitle">Ask questions about AI news and get intelligent insights</p>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Hello! I'm your AI news analyst. Ask me anything about the latest AI news, trends, or specific articles. How can I help you today?</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-suggestions">
+                    <button class="suggestion-btn" data-message="What are the main trends in AI this week?">
+                        <i class="fas fa-trending-up"></i>
+                        Main AI Trends
+                    </button>
+                    <button class="suggestion-btn" data-message="Summarize the most important AI news">
+                        <i class="fas fa-list"></i>
+                        Key News Summary
+                    </button>
+                    <button class="suggestion-btn" data-message="What are the latest developments in machine learning?">
+                        <i class="fas fa-brain"></i>
+                        ML Developments
+                    </button>
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="chatInput" placeholder="Ask me about AI news..." autocomplete="off">
+                        <button id="sendBtn" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-robot fa-spin"></i>
+            <p>AI is thinking...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+
+
