@@ -15,7 +15,7 @@ ENV/
 .ipynb_checkpoints/
 
 # Data and datasets
-data/
+
 datasets/
 *.csv
 *.tsv
