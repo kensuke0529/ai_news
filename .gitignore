@@ -14,16 +14,7 @@ ENV/
 # Jupyter notebooks
 .ipynb_checkpoints/
 
-# Data and datasets
 
-datasets/
-*.csv
-*.tsv
-*.json
-*.parquet
-*.zip
-*.tar
-*.gz
 
 # Model files / checkpoints
 checkpoints/
