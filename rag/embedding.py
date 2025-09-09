@@ -186,28 +186,37 @@ docs_scores = vector_store.similarity_search_with_score(query, k=2)
 
 threshold = 0.25 
 
-# Filter results
+# Filter results based on threshold
 filtered_results = [
     (doc, distance_to_confidence(score)) 
     for doc, score in docs_scores
     if distance_to_confidence(score) >= threshold
 ]
 
-# Handle the "no results" case
-if not filtered_results:
+# Deduplicate by link
+unique_links = set()
+deduped_results = []
+for doc, confidence in filtered_results:
+    # Extract link robustly
+    try:
+        parts = {}
+        for item in doc.page_content.split(" | "):
+            if ": " in item:
+                key, value = item.split(": ", 1)
+                parts[key] = value
+        link = parts.get("link", None)
+    except Exception:
+        link = None
+
+    if link and link not in unique_links:
+        unique_links.add(link)
+        deduped_results.append((parts, confidence))
+
+# Handle no results case
+if not deduped_results:
     print("No results found")
 else:
-    for i, (doc, confidence) in enumerate(filtered_results, start=1):
-        # FIXED: More robust parsing with error handling
-        try:
-            parts = {}
-            for item in doc.page_content.split(" | "):
-                if ": " in item:
-                    key, value = item.split(": ", 1)
-                    parts[key] = value
-        except Exception:
-            parts = {"title": "Parse Error", "summary": "Parse Error", "link": "Parse Error"}
-        
+    for i, (parts, confidence) in enumerate(deduped_results, start=1):
         print(f"\nResult {i}:")
         print("Title:", parts.get("title", "Unknown"))
         print("Summary:", parts.get("summary", "Unknown"))

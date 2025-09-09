@@ -68,7 +68,7 @@
                         <span class="news-date">{{ article.date }}</span>
                     </div>
                     <div class="news-summary">
-                        <p>{{ article.summary }}</p>
+                        {{ article.summary_html | safe }}
                     </div>
                     <div class="news-actions">
                         <a href="{{ article.link }}" target="_blank" class="btn btn-primary">

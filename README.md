@@ -1,119 +1,132 @@
 # AI News Analyst
+Cut through the AI news noise—**AI News Analyst** is an intelligent news platform designed to help busy professionals, researchers and students stay on top of AI trends.  
+Get concise weekly summaries, and deep article insights by RAG(retrieval-augmented generation).
 
-A modern web interface for AI-powered news analysis, featuring curated AI news articles, intelligent summaries, and interactive chat capabilities.
+> **Why use AI News Analyst?**  
+> - Save hours on manual research  
+> - Catch up quickly on fast-moving topics  
+> - Always have context: chat bot ask anything about the news
+
+---
+
+## Table of Contents
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Usage](#usage)
+- [Retrieval-Augmented Generation (RAG)](#retrieval-augmented-generation-rag)
+- [API](#api)
+- [Technologies](#technologies)
+- [Data Sources](#data-sources)
+- [Development & Future Plans](#development--future-plans)
+- [Quick Start](#quick-start)
+- [Contact & Contributing](#contact--contributing)
+
+---
 
 ## Features
 
-- **📰 News Dashboard**: Browse the latest AI news articles with summaries and direct links
-- **🤖 AI Summary**: Generate intelligent weekly summaries using advanced language models
-- **💬 Interactive Chat**: Ask questions about news articles and get AI-powered insights
-- **🎨 Modern UI**: Beautiful, responsive design with smooth animations and intuitive navigation
+- **Curated News Dashboard:** Browse up-to-date AI news with concise, AI-generated summaries and direct source links  
+- **Weekly Summary Reports:** Let the AI generate a week-in-review—a quick, smart overview of the biggest stories  
+- **AI Chat Assistant:** Ask questions about articles, themes, companies, or overall trends for instant context  
+- **RAG Similarity Search:** Find related news using a cutting-edge retrieval-augmented pipeline—explore clusters, discover patterns  
+- **Modern UX:** Responsive web design with intuitive navigation (mobile-friendly)  
+
+### What sets this apart?
+- Integrated Q&A over *all* stored news—no other aggregator explains context this deeply  
+- State-of-the-art vector similarity search for discovery  
+- Fully open, extensible—easy to add more sources or improve the underlying models
+
+---
 
 ## Project Structure
 
-```
+```plaintext
 ai_news/
-├── agents/                 # AI processing modules
-│   ├── chat_bot/          # Chat interface with news analyst
-│   ├── doc_loader/        # News loading and processing
-│   └── reporter/          # Weekly summary generation
-├── data/                  # News data storage
-├── static/                # Web assets (CSS, JS)
+├── agents/                # Core AI modules (chatbot, doc loader, summary reporter)
+├── data/                  # News datasets (JSON)
+├── rag/                   # RAG pipeline logic
+├── static/                # CSS/JS assets
 ├── templates/             # HTML templates
-├── app.py                 # Flask web application
+├── app.py                 # Flask app
 └── requirements.txt       # Python dependencies
 ```
 
-## Quick Start
-
-### 1. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Set Up Environment Variables
-
-Create a `.env` file in the project root:
-
-```bash
-OPENAI_API_KEY=your_openai_api_key_here
-```
-
-### 3. Run the Web Application
-
-```bash
-python app.py
-```
-
-The application will be available at `http://localhost:5000`
 
 ## Usage
 
-### News Section
-- View the latest AI news articles
-- Read summaries and access full articles
-- Use "Ask About This" buttons to get more information
+### News
+- Browse recent AI news
+- Read concise summaries or jump to full sources
+- Use **"Ask About This"** to get AI-powered analysis of any article
 
-### Summary Section
-- Automatically generates AI-powered weekly summaries
-- Click "Generate New Summary" to create fresh insights
-- Summaries are based on the current week's articles
+### Weekly Summary
+- Click **"Generate New Summary"** to receive a weekly report
 
-### Chat Section
-- Ask questions about news articles, trends, or specific topics
-- Get AI-powered analysis and insights
-- Use suggestion buttons for quick questions
-- Maintains conversation history during your session
+### Search
+- Enter a query to find related news using RAG
+- Results are de-duplicated and ranked by relevance
 
-## API Endpoints
+### Chat
+- Ask questions about articles, trends, or companies
+- Use quick-prompt chips for inspiration
+- Conversations persist during your session
 
-- `GET /` - Main application interface
-- `GET /api/summary` - Generate weekly AI summary
-- `POST /api/chat` - Send chat message and get response
-- `GET /api/news` - Retrieve news data
+---
 
-## Technologies Used
+## Retrieval-Augmented Generation (RAG)
 
-- **Backend**: Flask, Python
-- **AI/ML**: LangChain, OpenAI GPT models
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Styling**: Modern CSS with gradients, animations, and responsive design
-- **Icons**: Font Awesome
-- **Fonts**: Inter (Google Fonts)
+**How it works:**
+- Embeds all articles using `sentence-transformers/all-mpnet-base-v2` (selected for high semantic similarity accuracy)
+- Stores embeddings in a **Chroma** vector database (optimized for fast retrieval and scale)
+- At query time, retrieves relevant articles via similarity search—feeds results to the LLM for context-rich responses
 
-## Development
+**Pipeline:**
+1. **Load Articles:** Parse `data/` JSON files
+2. **Embed & Store:** Generate HuggingFace embeddings → Chroma DB
+3. **Query:** RAG similarity search with scoring
+4. **Deduplicate:** Remove duplicates by URL
+5. **Respond:** LLM answers using only verified news context
 
-### Running in Development Mode
+---
 
-```bash
-export FLASK_ENV=development
-python app.py
-```
+## API
 
-### Customizing the Interface
+| Endpoint              | Method | Description                 |
+|-----------------------|--------|-----------------------------|
+| `/news`               | GET    | Fetch latest news           |
+| `/summary`            | POST   | Generate weekly summary     |
+| `/chat`               | POST   | Interactive news Q&A        |
+| `/search?q=query`     | GET    | RAG similarity search       |
 
-- Modify `templates/index.html` for layout changes
-- Update `static/css/style.css` for styling modifications
-- Edit `static/js/app.js` for JavaScript functionality
+---
+
+## Technologies
+
+- **Backend:** Flask (Python)
+- **AI/ML:** LangChain, OpenAI GPT APIs, HuggingFace transformers
+- **Frontend:** HTML5, CSS3, JavaScript (ES6+)
+- **Database:** Chroma for vector embeddings
+- **Data:** JSON news dump (MIT AI News, extensible)
+
+---
 
 ## Data Sources
 
-The application currently uses MIT AI news data stored in JSON format. The system is designed to be easily extensible for additional news sources.
+- MIT AI News data (`data/`)
+- *Easy to extend to more sources—add a loader under `agents/doc_loader` and plug into the RAG pipeline.*
 
-## Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+## Development & Future Plans
 
-## License
+**Planned:**
+- Ingest more sources (e.g., TechCrunch, Arxiv, CB Insights)
+- Deploy a scalable demo (hosting TBA; currently local/prototype due to OpenAI API and vector DB costs)
+- Personalized feeds and user accounts
 
-This project is open source and available under the MIT License.
+**Issues/Help Wanted:**
+- Support new news formats
+- UI/UX improvements
+- Docker deployment script
 
-## Support
-
-For questions or issues, please open an issue in the repository or contact the development team.
-# ai_news
+---

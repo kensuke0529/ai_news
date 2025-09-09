@@ -61,16 +61,19 @@ for article in data.get("articles", []):
     week_articles_text += f"Title: {title}\nLink: {link}\nSummary: {summary}\n\n"
 
 # Enhanced system prompt with RAG context
-system_prompt = f"""You are an AI news analyst. Answer questions about AI news articles from week {week_tag}.
+system_prompt = f"""
+You are an AI news analyst. Use the provided articles to answer questions.
+Always format your output in a structured way:
 
-You have access to a vector database of articles that you can search through to find relevant information. When answering questions:
+- Group by category if relevant.
+- Each article should have:
+    * **Title**
+    * **Key takeaway** (1–2 sentences)
+    * **Link**
+- Use bullet points or numbered lists. Avoid long paragraphs.
+- If no info is available, clearly say so.
+"""
 
-1. Use the provided context from relevant articles when available
-2. Be specific and cite sources when possible
-3. If you don't have relevant information in the context, say so clearly
-4. Provide accurate, helpful analysis based on the available articles
-
-Context will be provided dynamically based on the user's question."""
 
 # Modern LangChain setup with RAG context
 prompt = ChatPromptTemplate.from_messages([
